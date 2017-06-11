@@ -1,10 +1,19 @@
 package com.example.piotr.rankingszachowy.Fragments;
 
+import android.Manifest;
 import android.app.Fragment;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,8 +30,12 @@ import android.widget.Toast;
 import com.example.piotr.rankingszachowy.DBHelpers.UserDBHelper;
 import com.example.piotr.rankingszachowy.R;
 
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Random;
+
+import static android.app.Activity.RESULT_OK;
 
 /**
  * Created by Piotr on 02.04.2017.
@@ -41,6 +54,9 @@ public class PlayerProfileFragment extends Fragment {
     private Spinner spinnerPlayer;
     UserDBHelper userDB;
     ImageButton btnEdit;
+    private Integer RESULT_LOAD_IMG = 1;
+    private ImageButton bttnProfilePic;
+    private Uri picURI;
 
     ArrayList<String> nicks;
 
@@ -61,11 +77,23 @@ public class PlayerProfileFragment extends Fragment {
 
         spinnerPlayer = (Spinner) view.findViewById(R.id.spinnerPlayer);
 
+
         nicks = new ArrayList<>();
         getNicks();
 
         final ArrayAdapter adapter2 = new ArrayAdapter(getActivity(), R.layout.support_simple_spinner_dropdown_item, nicks);
         spinnerPlayer.setAdapter(adapter2);
+
+        btnEdit = (ImageButton) view.findViewById(R.id.btnEditProfile);
+        bttnProfilePic = (ImageButton) view.findViewById(R.id.bttnProfilePicture);
+        bttnProfilePic.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
+                isStoragePermissionGranted();
+                profileOnClick();
+            }
+        });
 
         spinnerPlayer.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -96,7 +124,8 @@ public class PlayerProfileFragment extends Fragment {
                             etRank.getText().toString(),
                             etLastPlayed.getText().toString(),
                             etPlayingSince.getText().toString(),
-                            etAge.getText().toString());
+                            etAge.getText().toString(),
+                            picURI.toString());
                     if (isInserted) {
                         Toast.makeText(getActivity(), "Added to database", Toast.LENGTH_SHORT).show();
                         getNicks();
@@ -149,8 +178,78 @@ public class PlayerProfileFragment extends Fragment {
             etLastPlayed.setText(result.getString(3));
             etPlayingSince.setText(result.getString(4));
             etAge.setText(result.getString(5));
+            final InputStream imageStream;
+            try {
+                imageStream = getActivity().getContentResolver().openInputStream(Uri.parse(result.getString(6)));
+                final Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
+                bttnProfilePic.setImageBitmap(selectedImage);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+                Toast.makeText(getActivity(),"No Avatar",Toast.LENGTH_SHORT).show();
+            }
         }
     }
+
+
+    public  boolean isStoragePermissionGranted() {
+        if (Build.VERSION.SDK_INT >= 23) {
+            if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE)
+                    == PackageManager.PERMISSION_GRANTED) {
+                //Log.v(TAG,"Permission is granted");
+                return true;
+            } else {
+
+                //Log.v(TAG,"Permission is revoked");
+                ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
+                return false;
+            }
+        }
+        else { //permission is automatically granted on sdk<23 upon installation
+            //Log.v(TAG,"Permission is granted");
+            return true;
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if(grantResults[0]== PackageManager.PERMISSION_GRANTED){
+            //Log.v(TAG,"Permission: "+permissions[0]+ "was "+grantResults[0]);
+            profileOnClick();
+        }
+    }
+
+
+
+
+    public void profileOnClick(){
+        Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
+        photoPickerIntent.setType("image/*");
+        startActivityForResult(photoPickerIntent, RESULT_LOAD_IMG);
+    }
+
+    @Override
+    public void onActivityResult(int reqCode, int resultCode, Intent data) {
+        super.onActivityResult(reqCode, resultCode, data);
+
+
+        if (resultCode == RESULT_OK) {
+            try {
+                final Uri imageUri = data.getData();
+                final InputStream imageStream = getActivity().getContentResolver().openInputStream(imageUri);
+                final Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
+                bttnProfilePic.setImageBitmap(selectedImage);
+                picURI = imageUri;
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+                Toast.makeText(getActivity(), "Something went wrong", Toast.LENGTH_LONG).show();
+            }
+
+        }else {
+            Toast.makeText(getActivity(), "You haven't picked Image",Toast.LENGTH_LONG).show();
+        }
+    }
+
 
     private void getAll() {
         Cursor res = userDB.getAllData();

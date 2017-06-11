@@ -3,7 +3,9 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/ProjektRankingSzachowy2.iml" filepath="$PROJECT_DIR$/ProjektRankingSzachowy2.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ProjektRankingSzachowy2.iml" filepath="$PROJECT_DIR$/ProjektRankingSzachowy2.iml" />
       <module fileurl="file://$PROJECT_DIR$/RankingSzachowy.iml" filepath="$PROJECT_DIR$/RankingSzachowy.iml" />
+      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>

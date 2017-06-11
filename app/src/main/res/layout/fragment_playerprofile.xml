@@ -100,8 +100,7 @@
                             android:layout_height="wrap_content"
                             android:ems="10"
                             android:inputType="textPersonName"
-                            android:textSize="14sp"
-                            />
+                            android:textSize="14sp" />
                     </TableRow>
 
                     <TableRow
@@ -120,8 +119,7 @@
                             android:layout_height="wrap_content"
                             android:ems="10"
                             android:inputType="textPersonName"
-                            android:textSize="14sp"
-                            />
+                            android:textSize="14sp" />
                     </TableRow>
 
                     <TableRow
@@ -140,8 +138,7 @@
                             android:layout_height="wrap_content"
                             android:ems="10"
                             android:inputType="textPersonName"
-                            android:textSize="14sp"
-                            />
+                            android:textSize="14sp" />
                     </TableRow>
 
                     <TableRow
@@ -160,8 +157,7 @@
                             android:layout_height="wrap_content"
                             android:ems="10"
                             android:inputType="textPersonName"
-                            android:textSize="14sp"
-                            />
+                            android:textSize="14sp" />
                     </TableRow>
 
                     <TableRow
@@ -180,15 +176,17 @@
                             android:layout_height="wrap_content"
                             android:ems="10"
                             android:inputType="textPersonName"
-                            android:textSize="14sp"
-                            />
+                            android:textSize="14sp" />
                     </TableRow>
                 </TableLayout>
 
-                <ImageView
-                    android:id="@+id/imageView2"
-                    android:layout_width="138dp"
+                <ImageButton
+                    android:id="@+id/bttnProfilePicture"
+                    style="@style/Widget.AppCompat.ImageButton"
+                    android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:scaleType="fitXY"
                     app:srcCompat="@mipmap/ic_char" />
 
             </LinearLayout>

@@ -19,10 +19,11 @@ public class UserDBHelper extends SQLiteOpenHelper {
     private static final String LAST_PLAYED = "LAST_PLAYED";
     private static final String PLAYING_SINCE = "PLAYING_SINCE";
     private static final String AGE = "AGE";
+    private static final String PICURI = "PICURI";
 
 
     public UserDBHelper(Context context) {
-        super(context, DATABASE_NAME, null, 2);
+        super(context, DATABASE_NAME, null, 3);
 
     }
 
@@ -31,7 +32,7 @@ public class UserDBHelper extends SQLiteOpenHelper {
         String SQL_String = "CREATE TABLE " + TABLE_NAME + "(" + ID +
                 " INTEGER PRIMARY KEY AUTOINCREMENT, " + USERNAME + " TEXT, " +
                 RANK + " TEXT, " + LAST_PLAYED +" TEXT, "+ PLAYING_SINCE +" TEXT, "+
-                AGE +" INTEGER);";
+                AGE +" INTEGER, " + PICURI + " INTEGER);";
 
         db.execSQL(SQL_String);
     }
@@ -53,7 +54,7 @@ public class UserDBHelper extends SQLiteOpenHelper {
     }
 
     public boolean insertData(String username, String rank, String lastPlayed, String playingSince,
-                              String age) {
+                              String age, String picuri) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
         contentValues.put(USERNAME, username);
@@ -61,6 +62,7 @@ public class UserDBHelper extends SQLiteOpenHelper {
         contentValues.put(LAST_PLAYED, lastPlayed);
         contentValues.put(PLAYING_SINCE, playingSince);
         contentValues.put(AGE, age);
+        contentValues.put(PICURI, picuri);
         long result = db.insert(TABLE_NAME, null, contentValues);
         return result != -1;
     }
