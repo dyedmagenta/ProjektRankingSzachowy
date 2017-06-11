@@ -14,6 +14,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -57,6 +58,7 @@ public class PlayerProfileFragment extends Fragment {
     private Integer RESULT_LOAD_IMG = 1;
     private ImageButton bttnProfilePic;
     private Uri picURI;
+    String uriString;
 
     ArrayList<String> nicks;
 
@@ -76,7 +78,6 @@ public class PlayerProfileFragment extends Fragment {
         etPlayingSince = (EditText) view.findViewById(R.id.etPlayingSince);
 
         spinnerPlayer = (Spinner) view.findViewById(R.id.spinnerPlayer);
-
 
         nicks = new ArrayList<>();
         getNicks();
@@ -119,13 +120,18 @@ public class PlayerProfileFragment extends Fragment {
             public void onClick(View v) {
 
                 setEditMode(!isEditMode);
+                if(picURI != null && !picURI.equals(Uri.EMPTY))
+                    uriString = picURI.toString();
+                else
+                    uriString = "empty";
+
                 if (isEditMode) {
                     boolean isInserted = userDB.insertData(etUsername.getText().toString(),
                             etRank.getText().toString(),
                             etLastPlayed.getText().toString(),
                             etPlayingSince.getText().toString(),
                             etAge.getText().toString(),
-                            picURI.toString());
+                            uriString);
                     if (isInserted) {
                         Toast.makeText(getActivity(), "Added to database", Toast.LENGTH_SHORT).show();
                         getNicks();
@@ -152,6 +158,7 @@ public class PlayerProfileFragment extends Fragment {
         etRank.setText("");
         etLastPlayed.setText("");
         etPlayingSince.setText("");
+        bttnProfilePic.setImageResource(R.mipmap.ic_char);
     }
 
     private void getNicks() {
@@ -179,14 +186,18 @@ public class PlayerProfileFragment extends Fragment {
             etPlayingSince.setText(result.getString(4));
             etAge.setText(result.getString(5));
             final InputStream imageStream;
-            try {
-                imageStream = getActivity().getContentResolver().openInputStream(Uri.parse(result.getString(6)));
-                final Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
-                bttnProfilePic.setImageBitmap(selectedImage);
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-                Toast.makeText(getActivity(),"No Avatar",Toast.LENGTH_SHORT).show();
-            }
+            if(!result.getString(6).equals("empty")) {
+                try {
+                    imageStream = getActivity().getContentResolver().openInputStream(Uri.parse(result.getString(6)));
+                    final Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
+                    bttnProfilePic.setImageBitmap(selectedImage);
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                    Toast.makeText(getActivity(), "No Avatar", Toast.LENGTH_SHORT).show();
+                    bttnProfilePic.setImageResource(R.mipmap.ic_char);
+                }
+            } else
+                bttnProfilePic.setImageResource(R.mipmap.ic_char);
         }
     }
 
